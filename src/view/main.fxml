@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.embed.swing.SwingNode?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="view/theme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <left>
+      <VBox id="ControlPanel" alignment="TOP_CENTER" prefWidth="150.0" spacing="8.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Количество вершин:" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="GothamPro" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="labelNumberOfVertex" alignment="CENTER" contentDisplay="CENTER" text="1" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="GothamPro" size="18.0" />
+               </font>
+            </Label>
+            <Slider fx:id="sliderNumberOfVertex" blockIncrement="1.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="10.0" />
+            <Button mnemonicParsing="false" onAction="#buildGraph" text="Построить граф" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="GothamPro" size="12.0" />
+               </font></Button>
+            <Button mnemonicParsing="false" onAction="#testPressed" text="ТЕСТ" />
+            <Separator prefWidth="200.0" />
+            <Label text="Алгоритм" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="GothamPro" size="12.0" />
+               </font></Label>
+            <VBox spacing="8.0">
+               <children>
+                  <RadioButton fx:id="radioButtonLevit" mnemonicParsing="false" text="Левита" wrapText="true">
+                     <font>
+                        <Font name="GothamPro" size="12.0" />
+                     </font>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="toggleGroupAlgorythms" />
+                     </toggleGroup></RadioButton>
+                  <RadioButton fx:id="radioButtonKaraskal" mnemonicParsing="false" text="Краскала" toggleGroup="$toggleGroupAlgorythms">
+                     <font>
+                        <Font name="GothamPro" size="12.0" />
+                     </font></RadioButton>
+                  <HBox fx:id="hBoxSelectVertices" minHeight="0.0" prefHeight="0.0" spacing="8.0" visible="false">
+                     <children>
+                        <ChoiceBox fx:id="choiceBoxVertex1" prefWidth="150.0" />
+                        <ChoiceBox fx:id="choiceBoxVertex2" prefWidth="150.0" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <Button mnemonicParsing="false" text="Запуск" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="GothamPro" size="12.0" />
+               </font>
+            </Button>
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+         </padding></VBox>
+   </left>
+   <center>
+       <Pane fx:id="paneGraph" style="-fx-background-color: cyan;" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>
