@@ -6,10 +6,8 @@ import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
-import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -20,8 +18,8 @@ import javafx.scene.layout.Pane;
 import model.CGraph;
 import model.Edge;
 import model.Vertex;
+import view.CustomSwingNode;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class Controller {
@@ -50,7 +48,7 @@ public class Controller {
     @FXML
     private ChoiceBox choiceBoxVertex2;
 
-    private SwingNode graphPanel;
+    private CustomSwingNode graphPanel;
 
     @FXML
     private void initialize() {
@@ -60,7 +58,12 @@ public class Controller {
             hBoxSelectVertices.setMinHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
             hBoxSelectVertices.setPrefHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
         });
-        graphPanel = new SwingNode();
+
+        graphPanel = new CustomSwingNode();
+        paneGraph.getChildren().add(graphPanel);
+        paneGraph.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> {
+            graphPanel.resize(newValue.getWidth(), newValue.getHeight());
+        });
     }
 
     BasicVisualizationServer<Vertex, Edge> vv;
@@ -76,6 +79,7 @@ public class Controller {
             return;
         }
 
+
         Bounds bounds = paneGraph.getBoundsInParent();
 
         CGraph cg = CGraph.getInstance().create(Integer.parseInt(labelNumberOfVertex.getText()));
@@ -88,13 +92,9 @@ public class Controller {
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
         vv.getRenderContext().setVertexFillPaintTransformer(vertex -> Color.ORANGE);
 
-
-       // graphPanel.prefHeight(bounds.getHeight());
-        //graphPanel.prefWidth(bounds.getWidth());
         graphPanel.setContent(vv);
         System.out.println(graphPanel.getBoundsInLocal());
 
-        //paneGraph.getChildren().add(graphPanel);
         ObservableList vertices = cg.getVertices();
 
         choiceBoxVertex1.setItems(vertices);
