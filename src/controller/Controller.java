@@ -66,7 +66,7 @@ public class Controller {
         toggleGroupAlgorythms.selectedToggleProperty().addListener((ov, old_val, new_val) -> {
             hBoxSelectVertices.setVisible(radioButtonLevit.isSelected());
             hBoxSelectVertices.setMinHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
-            hBoxSelectVertices.setPrefHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
+            CGraph.setCurrentALgorithm(radioButtonLevit.isSelected()?CGraph.LEVIT:CGraph.KRUSKAL);
         });
 
         graphPanel = new CustomSwingNode();
@@ -98,7 +98,7 @@ public class Controller {
         Graph<Vertex, Edge> graph = CGraph.create(Integer.parseInt(labelNumberOfVertex.getText()));
         Layout<Vertex, Edge> layout = new ISOMLayout<>(graph);
         layout.setSize(new Dimension((int)bounds.getWidth()-25, (int)bounds.getHeight()-25));
-        vv = new BasicVisualizationServer<Vertex, Edge>(layout);
+        vv = new BasicVisualizationServer<>(layout);
         vv.setSize(new Dimension((int)bounds.getWidth(), (int)bounds.getHeight()));
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<>());
@@ -111,21 +111,22 @@ public class Controller {
         choiceBoxVertex1.setValue(vertices.get(0));
         choiceBoxVertex2.setValue(vertices.get(vertices.size()-1));
 
-        activateAlgorithms();
+        activateAlgorithmsPanel();
     }
 
-    private void activateAlgorithms() {
+    private void activateAlgorithmsPanel() {
         vBoxAlgorithms.setDisable(false);
         buttonStartAlgorithm.setDisable(false);
     }
 
     public void testPressed(ActionEvent actionEvent) {
         vv.getRenderContext().setVertexFillPaintTransformer(vertex -> {
-            if(vertex.equals(new Vertex(1)))return Color.CYAN;
+            if (vertex.equals(new Vertex(1))) return Color.CYAN;
             return Color.ORANGE;
         });
         vv.getRenderContext().setEdgeDrawPaintTransformer(edge ->{
-            if(edge.getId().equals("1-2"))return Color.RED;
+            //if(edge.getId().equals("1-2"))return Color.RED;
+            if(edge.getState().equals(Edge.HIDE)) return new Color(0, 0, 0, 0);
             return Color.BLACK;
         });
         vv.updateUI();
