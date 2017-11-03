@@ -2,9 +2,9 @@ package model;
 
 public class Edge{
 
-    public static String NORMAL = "normal";
-    public static String HIDE = "hide";
-    public static String PATH = "path";
+    public final static String NORMAL = "normal";
+    public final static String HIDE = "hide";
+    public final static String PATH = "path";
 
     private int weight;
     private String id;
@@ -33,6 +33,12 @@ public class Edge{
     @Override
     public String toString() {
         return "w" + weight;
+    }
+
+    public int compare(Edge edge){
+        if(weight < edge.getWeight()) return -1;
+        if(weight > edge.getWeight()) return 1;
+        return 0;
     }
 
     public boolean equals(Edge e) {

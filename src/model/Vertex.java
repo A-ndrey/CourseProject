@@ -11,12 +11,12 @@ public class Vertex{
         return id;
     }
 
+    public boolean equals(Vertex v) {
+        return id == v.getId();
+    }
+
     @Override
     public String toString() {
         return "v" + id;
-    }
-
-    public boolean equals(Vertex v) {
-        return id == v.getId();
     }
 }

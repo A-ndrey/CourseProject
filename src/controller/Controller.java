@@ -9,6 +9,7 @@ import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
@@ -21,10 +22,9 @@ import javafx.scene.layout.VBox;
 import model.CGraph;
 import model.Edge;
 import model.Vertex;
-import view.CustomSwingNode;
 
 import java.awt.*;
-import java.util.function.Consumer;
+import java.awt.geom.Ellipse2D;
 
 public class Controller {
 
@@ -58,7 +58,7 @@ public class Controller {
     @FXML
     private Button buttonStartAlgorithm;
 
-    private CustomSwingNode graphPanel;
+    private SwingNode graphPanel;
 
     @FXML
     private void initialize() {
@@ -66,17 +66,28 @@ public class Controller {
         toggleGroupAlgorythms.selectedToggleProperty().addListener((ov, old_val, new_val) -> {
             hBoxSelectVertices.setVisible(radioButtonLevit.isSelected());
             hBoxSelectVertices.setMinHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
-            CGraph.setCurrentALgorithm(radioButtonLevit.isSelected()?CGraph.LEVIT:CGraph.KRUSKAL);
+            CGraph.setCurrentALgorithm(radioButtonLevit.isSelected() ? CGraph.LEVIT : CGraph.KRUSKAL);
+
+            vv.updateUI();
         });
 
-        graphPanel = new CustomSwingNode();
+        graphPanel = new SwingNode() {
+            @Override
+            public boolean isResizable() {
+                return false;
+            }
+        };
         paneGraph.getChildren().add(graphPanel);
         paneGraph.boundsInLocalProperty().addListener((observable, oldValue, newValue) -> {
             graphPanel.resize(newValue.getWidth(), newValue.getHeight());
         });
 
+
         choiceBoxVertex1.setItems(CGraph.getVertices());
+        choiceBoxVertex1.valueProperty().addListener((observable, oldValue, newValue) -> vv.updateUI());
         choiceBoxVertex2.setItems(CGraph.getVertices());
+        choiceBoxVertex2.valueProperty().addListener((observable, oldValue, newValue) -> vv.updateUI());
+
     }
 
     BasicVisualizationServer<Vertex, Edge> vv;
@@ -92,26 +103,44 @@ public class Controller {
             return;
         }
 
-
         Bounds bounds = paneGraph.getBoundsInParent();
 
         Graph<Vertex, Edge> graph = CGraph.create(Integer.parseInt(labelNumberOfVertex.getText()));
         Layout<Vertex, Edge> layout = new ISOMLayout<>(graph);
-        layout.setSize(new Dimension((int)bounds.getWidth()-25, (int)bounds.getHeight()-25));
+        layout.setSize(new Dimension((int) bounds.getWidth() - 25, (int) bounds.getHeight() - 25));
         vv = new BasicVisualizationServer<>(layout);
-        vv.setSize(new Dimension((int)bounds.getWidth(), (int)bounds.getHeight()));
+        vv.setSize(new Dimension((int) bounds.getWidth(), (int) bounds.getHeight()));
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<>());
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
-        vv.getRenderContext().setVertexFillPaintTransformer(vertex -> Color.ORANGE);
+        vv.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
+            switch (edge.getState()) {
+                case Edge.HIDE:
+                    return new Color(0, true);
+                case Edge.PATH:
+                    return Color.RED;
+            }
+            return Color.BLACK;
+        });
+        vv.getRenderContext().setVertexFillPaintTransformer(vertex ->{
+            Vertex v1 = (Vertex)choiceBoxVertex1.getValue();
+            Vertex v2 = (Vertex)choiceBoxVertex2.getValue();
+            if(radioButtonLevit.isSelected() && (vertex.equals(v1) || vertex.equals(v2))) return Color.CYAN;
+            return Color.ORANGE;
+        });
 
         graphPanel.setContent(vv);
 
         ObservableList<Vertex> vertices = CGraph.getVertices();
         choiceBoxVertex1.setValue(vertices.get(0));
-        choiceBoxVertex2.setValue(vertices.get(vertices.size()-1));
+        choiceBoxVertex2.setValue(vertices.get(vertices.size() - 1));
 
         activateAlgorithmsPanel();
+    }
+
+    public void startAlgorithm(ActionEvent actionEvent){
+        CGraph.startAlgorithm();
+        vv.updateUI();
     }
 
     private void activateAlgorithmsPanel() {
@@ -119,16 +148,4 @@ public class Controller {
         buttonStartAlgorithm.setDisable(false);
     }
 
-    public void testPressed(ActionEvent actionEvent) {
-        vv.getRenderContext().setVertexFillPaintTransformer(vertex -> {
-            if (vertex.equals(new Vertex(1))) return Color.CYAN;
-            return Color.ORANGE;
-        });
-        vv.getRenderContext().setEdgeDrawPaintTransformer(edge ->{
-            //if(edge.getId().equals("1-2"))return Color.RED;
-            if(edge.getState().equals(Edge.HIDE)) return new Color(0, 0, 0, 0);
-            return Color.BLACK;
-        });
-        vv.updateUI();
-    }
 }

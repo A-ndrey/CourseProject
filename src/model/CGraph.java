@@ -1,12 +1,16 @@
 package model;
 
 import com.sun.javafx.collections.ObservableListWrapper;
+import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
+import edu.uci.ics.jung.graph.DelegateTree;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseGraph;
+import edu.uci.ics.jung.graph.Tree;
+import edu.uci.ics.jung.graph.util.Pair;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CGraph {
 
@@ -65,7 +69,7 @@ public class CGraph {
         CGraph.currentALgorithm = currentALgorithm;
     }
 
-    public void startALgorithm(){
+    public static void startAlgorithm(){
         if(currentALgorithm.equals(LEVIT)){
             startLevitAlgorithm();
         } else if(currentALgorithm.equals(KRUSKAL)){
@@ -73,16 +77,32 @@ public class CGraph {
         }
     }
 
-    public void resetResult(){
+    public static void resetResult(){
 
     }
 
-    private void startLevitAlgorithm(){
+    private static void startLevitAlgorithm(){
 
     }
 
-    private void startKruskalAlgorithm(){
-
+    private static void startKruskalAlgorithm(){
+        List<Edge> sortedEdges = graph.getEdges().stream().sorted(Edge::compare).collect(Collectors.toList());
+        Graph<Vertex, Edge> temp = new SparseGraph<>();
+        DijkstraShortestPath<Vertex, Edge> alg = new DijkstraShortestPath<>(temp, Edge::getWeight);
+        sortedEdges.forEach(edge -> {
+            Pair<Vertex> pair = graph.getEndpoints(edge);
+            int distance = 0;
+            try{
+                distance = alg.getDistance(pair.getFirst(), pair.getSecond()).intValue();
+            } catch (Exception e){}
+            if(distance > 0){
+                edge.setState(Edge.HIDE);
+            } else {
+                temp.addVertex(pair.getFirst());
+                temp.addVertex(pair.getSecond());
+                temp.addEdge(edge, pair.getFirst(), pair.getSecond());
+            }
+        });
     }
 
     private CGraph(){}
