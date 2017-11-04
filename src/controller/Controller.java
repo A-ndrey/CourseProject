@@ -24,7 +24,6 @@ import model.Edge;
 import model.Vertex;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 
 public class Controller {
 
@@ -68,6 +67,8 @@ public class Controller {
             hBoxSelectVertices.setMinHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
             CGraph.setCurrentALgorithm(radioButtonLevit.isSelected() ? CGraph.LEVIT : CGraph.KRUSKAL);
 
+            buttonStartAlgorithm.setDisable(false);
+
             vv.updateUI();
         });
 
@@ -82,11 +83,18 @@ public class Controller {
             graphPanel.resize(newValue.getWidth(), newValue.getHeight());
         });
 
-
         choiceBoxVertex1.setItems(CGraph.getVertices());
-        choiceBoxVertex1.valueProperty().addListener((observable, oldValue, newValue) -> vv.updateUI());
+        choiceBoxVertex1.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) ((Vertex) oldValue).setState(Vertex.NORMAL);
+            if (newValue != null) ((Vertex) newValue).setState(Vertex.START);
+            vv.updateUI();
+        });
         choiceBoxVertex2.setItems(CGraph.getVertices());
-        choiceBoxVertex2.valueProperty().addListener((observable, oldValue, newValue) -> vv.updateUI());
+        choiceBoxVertex2.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) ((Vertex) oldValue).setState(Vertex.NORMAL);
+            if (newValue != null) ((Vertex) newValue).setState(Vertex.END);
+            vv.updateUI();
+        });
 
     }
 
@@ -94,24 +102,48 @@ public class Controller {
 
     public void buildGraph(ActionEvent actionEvent) {
         if (labelNumberOfVertex.getText().equals("0")) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Ошибка при построении графа");
-            alert.setHeaderText(null);
-            alert.setContentText("Количество вершин должно быть больше 0");
-
-            alert.showAndWait();
+            createAlert().showAndWait();
             return;
         }
+
+        buttonStartAlgorithm.setText("Запуск");
 
         Bounds bounds = paneGraph.getBoundsInParent();
 
         Graph<Vertex, Edge> graph = CGraph.create(Integer.parseInt(labelNumberOfVertex.getText()));
+
         Layout<Vertex, Edge> layout = new ISOMLayout<>(graph);
         layout.setSize(new Dimension((int) bounds.getWidth() - 25, (int) bounds.getHeight() - 25));
+
         vv = new BasicVisualizationServer<>(layout);
         vv.setSize(new Dimension((int) bounds.getWidth(), (int) bounds.getHeight()));
+        setViewVisualization();
+
+        graphPanel.setContent(vv);
+
+        ObservableList<Vertex> vertices = CGraph.getVertices();
+
+        choiceBoxVertex1.setValue(vertices.get(0));
+        choiceBoxVertex2.setValue(vertices.get(vertices.size() - 1));
+
+        vBoxAlgorithms.setDisable(false);
+    }
+
+    private Alert createAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Ошибка при построении графа");
+        alert.setHeaderText(null);
+        alert.setContentText("Количество вершин должно быть больше 0");
+        return alert;
+    }
+
+    private void setViewVisualization() {
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
         vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<>());
+        vv.getRenderContext().setEdgeLabelTransformer(edge -> {
+            if(edge.getState() != Edge.HIDE) return edge.toString();
+            return "";
+        });
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
         vv.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
             switch (edge.getState()) {
@@ -122,30 +154,22 @@ public class Controller {
             }
             return Color.BLACK;
         });
-        vv.getRenderContext().setVertexFillPaintTransformer(vertex ->{
-            Vertex v1 = (Vertex)choiceBoxVertex1.getValue();
-            Vertex v2 = (Vertex)choiceBoxVertex2.getValue();
-            if(radioButtonLevit.isSelected() && (vertex.equals(v1) || vertex.equals(v2))) return Color.CYAN;
+        vv.getRenderContext().setVertexFillPaintTransformer(vertex -> {
+            if (radioButtonLevit.isSelected() && (vertex.getState() == Vertex.START || vertex.getState() == Vertex.END)) return Color.CYAN;
             return Color.ORANGE;
         });
-
-        graphPanel.setContent(vv);
-
-        ObservableList<Vertex> vertices = CGraph.getVertices();
-        choiceBoxVertex1.setValue(vertices.get(0));
-        choiceBoxVertex2.setValue(vertices.get(vertices.size() - 1));
-
-        activateAlgorithmsPanel();
     }
 
-    public void startAlgorithm(ActionEvent actionEvent){
-        CGraph.startAlgorithm();
+    public void startAlgorithm(ActionEvent actionEvent) {
+        if (buttonStartAlgorithm.getText().equals("Запуск")) {
+            CGraph.startAlgorithm();
+            buttonStartAlgorithm.setText("Сброс");
+            vBoxAlgorithms.setDisable(true);
+        } else {
+            CGraph.resetResult();
+            buttonStartAlgorithm.setText("Запуск");
+            vBoxAlgorithms.setDisable(false);
+        }
         vv.updateUI();
     }
-
-    private void activateAlgorithmsPanel() {
-        vBoxAlgorithms.setDisable(false);
-        buttonStartAlgorithm.setDisable(false);
-    }
-
 }
