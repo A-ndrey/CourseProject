@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="view/theme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="background" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.Controller">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -40,14 +40,14 @@
       </MenuBar>
    </top>
    <left>
-      <VBox id="ControlPanel" alignment="TOP_CENTER" prefWidth="150.0" spacing="8.0" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" prefWidth="150.0" spacing="8.0" styleClass="control-pane" BorderPane.alignment="CENTER">
          <children>
             <Label text="Количество вершин:" textAlignment="CENTER" wrapText="true">
                <font>
-                  <Font name="GothamPro" size="12.0" />
+                  <Font name="Arial" size="12.0" />
                </font>
             </Label>
-            <Label fx:id="labelNumberOfVertex" alignment="CENTER" contentDisplay="CENTER" text="1" textAlignment="CENTER" wrapText="true">
+            <Label fx:id="labelNumberOfVertex" alignment="CENTER" contentDisplay="CENTER" text="10" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font name="GothamPro" size="18.0" />
                </font>
@@ -55,25 +55,25 @@
             <Slider fx:id="sliderNumberOfVertex" blockIncrement="1.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" value="10.0" />
             <Button mnemonicParsing="false" onAction="#buildGraph" text="Построить граф" textAlignment="CENTER" wrapText="true">
                <font>
-                  <Font name="GothamPro" size="12.0" />
+                  <Font name="Arial" size="12.0" />
                </font></Button>
-            <Separator prefWidth="200.0" />
+            <Separator prefWidth="200.0" styleClass="separator" />
             <Label text="Алгоритм" textAlignment="CENTER" wrapText="true">
                <font>
-                  <Font name="GothamPro" size="12.0" />
+                  <Font name="Arial" size="12.0" />
                </font></Label>
             <VBox fx:id="vBoxAlgorithms" disable="true" spacing="8.0">
                <children>
                   <RadioButton fx:id="radioButtonLevit" mnemonicParsing="false" text="Левита" wrapText="true">
                      <font>
-                        <Font name="GothamPro" size="12.0" />
+                        <Font name="Arial" size="12.0" />
                      </font>
                      <toggleGroup>
                         <ToggleGroup fx:id="toggleGroupAlgorythms" />
                      </toggleGroup></RadioButton>
                   <RadioButton fx:id="radioButtonKaraskal" mnemonicParsing="false" text="Краскала" toggleGroup="$toggleGroupAlgorythms">
                      <font>
-                        <Font name="GothamPro" size="12.0" />
+                        <Font name="Arial" size="12.0" />
                      </font></RadioButton>
                   <HBox fx:id="hBoxSelectVertices" minHeight="0.0" prefHeight="0.0" spacing="8.0" visible="false">
                      <children>
@@ -83,9 +83,9 @@
                   </HBox>
                </children>
             </VBox>
-            <Button fx:id="buttonStartAlgorithm" onAction="#startAlgorithm" disable="true" mnemonicParsing="false" text="Запуск" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="buttonStartAlgorithm" disable="true" mnemonicParsing="false" onAction="#startAlgorithm" text="Запуск" textAlignment="CENTER" wrapText="true">
                <font>
-                  <Font name="GothamPro" size="12.0" />
+                  <Font name="Arial" size="12.0" />
                </font>
             </Button>
          </children>

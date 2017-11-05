@@ -4,6 +4,7 @@ import edu.uci.ics.jung.algorithms.layout.ISOMLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
+import edu.uci.ics.jung.visualization.RenderContext;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
@@ -22,8 +23,10 @@ import javafx.scene.layout.VBox;
 import model.CGraph;
 import model.Edge;
 import model.Vertex;
+import org.apache.commons.collections15.Transformer;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 public class Controller {
 
@@ -138,25 +141,30 @@ public class Controller {
     }
 
     private void setViewVisualization() {
-        vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<>());
-        vv.getRenderContext().setEdgeShapeTransformer(new EdgeShape.Line<>());
-        vv.getRenderContext().setEdgeLabelTransformer(edge -> {
-            if(edge.getState() != Edge.HIDE) return edge.toString();
-            return "";
-        });
+        vv.setBackground(new Color(0x2a2a2a));
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
-        vv.getRenderContext().setEdgeDrawPaintTransformer(edge -> {
+        vv.setForeground(new Color(0xd1d1d1));
+        RenderContext<Vertex, Edge> context = vv.getRenderContext();
+        context.setEdgeShapeTransformer(new EdgeShape.Line<>());
+//        context.setEdgeLabelTransformer(edge -> {
+//            if(edge.getState() != Edge.HIDE) return edge.toString();
+//            return "";
+//        });
+        context.setEdgeDrawPaintTransformer(edge -> {
             switch (edge.getState()) {
                 case Edge.HIDE:
                     return new Color(0, true);
                 case Edge.PATH:
                     return Color.RED;
             }
-            return Color.BLACK;
+            return new Color(0xd1d1d1);
         });
-        vv.getRenderContext().setVertexFillPaintTransformer(vertex -> {
-            if (radioButtonLevit.isSelected() && (vertex.getState() == Vertex.START || vertex.getState() == Vertex.END)) return Color.CYAN;
-            return Color.ORANGE;
+        context.setVertexLabelTransformer(new ToStringLabeller<>());
+        context.setVertexShapeTransformer(vertex -> new Ellipse2D.Double(-15, -15, 30, 30));
+        context.setVertexDrawPaintTransformer(vertex -> new Color(0xd1d1d1));
+        context.setVertexFillPaintTransformer(vertex -> {
+            if (radioButtonLevit.isSelected() && (vertex.getState() == Vertex.START || vertex.getState() == Vertex.END)) return new Color(0x5a5a5a);
+            return new Color(0x2a2a2a);
         });
     }
 

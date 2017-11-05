@@ -32,6 +32,6 @@ public class Vertex{
 
     @Override
     public String toString() {
-        return "v" + id;
+        return "" + id;
     }
 }
