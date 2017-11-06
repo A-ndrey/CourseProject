@@ -5,8 +5,11 @@ import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 import edu.uci.ics.jung.visualization.RenderContext;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.*;
 import edu.uci.ics.jung.visualization.decorators.EdgeShape;
 import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
+import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -26,6 +29,7 @@ import model.Vertex;
 import org.apache.commons.collections15.Transformer;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 
 public class Controller {
@@ -49,10 +53,10 @@ public class Controller {
     private RadioButton radioButtonLevit;
 
     @FXML
-    private ChoiceBox choiceBoxVertex1;
+    private ComboBox comboBoxVertex1;
 
     @FXML
-    private ChoiceBox choiceBoxVertex2;
+    private ComboBox comboBoxVertex2;
 
     @FXML
     private VBox vBoxAlgorithms;
@@ -61,6 +65,8 @@ public class Controller {
     private Button buttonStartAlgorithm;
 
     private SwingNode graphPanel;
+
+    private VisualizationViewer<Vertex, Edge> vv;
 
     @FXML
     private void initialize() {
@@ -86,22 +92,21 @@ public class Controller {
             graphPanel.resize(newValue.getWidth(), newValue.getHeight());
         });
 
-        choiceBoxVertex1.setItems(CGraph.getVertices());
-        choiceBoxVertex1.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != null) ((Vertex) oldValue).setState(Vertex.NORMAL);
-            if (newValue != null) ((Vertex) newValue).setState(Vertex.START);
+        comboBoxVertex1.setItems(CGraph.getVertices());
+        comboBoxVertex1.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) ((Vertex) oldValue).setSource(false);
+            if (newValue != null) ((Vertex) newValue).setSource(true);
             vv.updateUI();
         });
-        choiceBoxVertex2.setItems(CGraph.getVertices());
-        choiceBoxVertex2.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (oldValue != null) ((Vertex) oldValue).setState(Vertex.NORMAL);
-            if (newValue != null) ((Vertex) newValue).setState(Vertex.END);
+        comboBoxVertex2.setItems(CGraph.getVertices());
+        comboBoxVertex2.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != null) ((Vertex) oldValue).setTarget(false);
+            if (newValue != null) ((Vertex) newValue).setTarget(true);
             vv.updateUI();
         });
 
     }
 
-    BasicVisualizationServer<Vertex, Edge> vv;
 
     public void buildGraph(ActionEvent actionEvent) {
         if (labelNumberOfVertex.getText().equals("0")) {
@@ -118,16 +123,23 @@ public class Controller {
         Layout<Vertex, Edge> layout = new ISOMLayout<>(graph);
         layout.setSize(new Dimension((int) bounds.getWidth() - 25, (int) bounds.getHeight() - 25));
 
-        vv = new BasicVisualizationServer<>(layout);
+        vv = new VisualizationViewer<Vertex, Edge>(layout);
         vv.setSize(new Dimension((int) bounds.getWidth(), (int) bounds.getHeight()));
-        setViewVisualization();
+        setGraphVisualization();
+
+        PluggableGraphMouse gm = new PluggableGraphMouse();
+        PickingGraphMousePlugin<Vertex, Edge> pgmp = new PickingGraphMousePlugin<>();
+        pgmp.setLensColor(new Color(0xd1d1d1));
+        gm.add(pgmp);
+        gm.add(new ScalingGraphMousePlugin(new CrossoverScalingControl(), 0, 1.1f, 0.9f));
+        vv.setGraphMouse(gm);
 
         graphPanel.setContent(vv);
 
         ObservableList<Vertex> vertices = CGraph.getVertices();
 
-        choiceBoxVertex1.setValue(vertices.get(0));
-        choiceBoxVertex2.setValue(vertices.get(vertices.size() - 1));
+        comboBoxVertex1.setValue(vertices.get(0));
+        comboBoxVertex2.setValue(vertices.get(vertices.size() - 1));
 
         vBoxAlgorithms.setDisable(false);
     }
@@ -140,12 +152,13 @@ public class Controller {
         return alert;
     }
 
-    private void setViewVisualization() {
+    private void setGraphVisualization() {
         vv.setBackground(new Color(0x2a2a2a));
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
         vv.setForeground(new Color(0xd1d1d1));
         RenderContext<Vertex, Edge> context = vv.getRenderContext();
         context.setEdgeShapeTransformer(new EdgeShape.Line<>());
+        context.setEdgeStrokeTransformer(edge -> new BasicStroke(2));
 //        context.setEdgeLabelTransformer(edge -> {
 //            if(edge.getState() != Edge.HIDE) return edge.toString();
 //            return "";
@@ -159,11 +172,13 @@ public class Controller {
             }
             return new Color(0xd1d1d1);
         });
+        context.setVertexLabelRenderer(new DefaultVertexLabelRenderer(new Color(0xd1d1d1)));
         context.setVertexLabelTransformer(new ToStringLabeller<>());
+        context.setVertexStrokeTransformer(vertex -> new BasicStroke(2));
         context.setVertexShapeTransformer(vertex -> new Ellipse2D.Double(-15, -15, 30, 30));
         context.setVertexDrawPaintTransformer(vertex -> new Color(0xd1d1d1));
         context.setVertexFillPaintTransformer(vertex -> {
-            if (radioButtonLevit.isSelected() && (vertex.getState() == Vertex.START || vertex.getState() == Vertex.END)) return new Color(0x5a5a5a);
+            if (radioButtonLevit.isSelected() && (vertex.isSource() || vertex.isTaret())) return new Color(0x5a5a5a);
             return new Color(0x2a2a2a);
         });
     }

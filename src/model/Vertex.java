@@ -2,24 +2,29 @@ package model;
 
 public class Vertex{
 
-    public static final String START = "start";
-    public static final String END = "end";
-    public static final String NORMAL = "normal";
 
-    private String state;
+    private boolean source;
+    private boolean target;
     private int id;
 
     public Vertex(int id){
         this.id = id;
-        this.state = NORMAL;
     }
 
-    public void setState(String state){
-        this.state = state;
+    public void setSource(boolean source){
+        this.source = source;
     }
 
-    public String getState(){
-        return  state;
+    public void setTarget(boolean target){
+        this.target = target;
+    }
+
+    public boolean isSource(){
+        return source;
+    }
+
+    public boolean isTaret(){
+        return target;
     }
 
     public int getId() {

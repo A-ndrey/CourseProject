@@ -1,7 +1,6 @@
 package model;
 
 import com.sun.javafx.collections.ObservableListWrapper;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
@@ -47,7 +46,7 @@ public class CGraph {
             graph.addEdge(new Edge(random.nextInt(MAX_WEIGHT - MIN_WEIGHT) + MIN_WEIGHT, v1.getId() + "-" + v2.getId()), v1, v2);
             Vertex tempV = vertices.get(random.nextInt(i));
             if (random.nextInt(5) < 3)
-                graph.addEdge(new Edge(random.nextInt(20), v2.getId() + "-" + tempV.getId()), v2, tempV);
+                graph.addEdge(new Edge(random.nextInt(MAX_WEIGHT - MIN_WEIGHT) + MIN_WEIGHT, v2.getId() + "-" + tempV.getId()), v2, tempV);
             if (random.nextInt(3) > 0) {
                 v1 = v2;
             }
@@ -72,8 +71,8 @@ public class CGraph {
         if (currentAlgorithm.equals(LEVIT)) {
             Vertex s = null, d = null;
             for (Vertex v : vertices) {
-                if (v.getState() == Vertex.START) s = v;
-                else if (v.getState() == Vertex.END) d = v;
+                if (v.isSource()) s = v;
+                else if (v.isTaret()) d = v;
                 if (s != null && d != null) break;
             }
             startLevitAlgorithm(graph, s, d);

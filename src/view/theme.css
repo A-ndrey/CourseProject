@@ -40,3 +40,68 @@
   -fx-text-fill: derived(#2a2a2a, 20%);
 }
 
+.radio-button {
+    -fx-text-fill: #d1d1d1;
+    -fx-font-size: 11pt;
+}
+
+.radio-button .radio {
+    -fx-background-color: transparent;
+    -fx-background-radius: 1.0em;
+    -fx-background-insets: 0;
+
+    -fx-border-width: 2px;
+    -fx-border-color: #d1d1d1;
+    -fx-border-radius: 1.0em;
+
+    -fx-padding: 3px;
+}
+
+.radio-button .dot {
+    -fx-mark-color: #d1d1d1;
+    -fx-mark-highlight-color: transparent;
+    -fx-background-radius: 1.0em;
+    -fx-padding: 4px;
+}
+
+.slider{
+    -fx-padding: 6px;
+}
+
+.slider .track{
+    -fx-background-radius: 1.0em;
+    -fx-background-color: #d1d1d1;
+    -fx-padding: 2px;
+}
+
+.slider .thumb{
+    -fx-background-color: derived(#2a2a2a, 20%);
+    -fx-border-radius: 1.0em;
+    -fx-border-width: 2px;
+    -fx-border-color: #d1d1d1;
+}
+
+.combo-box {
+    -fx-background-color: transparent;
+    -fx-border-color: #d1d1d1;
+    -fx-border-width: 2px;
+    -fx-mark-color: derived(#2a2a2a, 20%);
+}
+
+.combo-box .list-cell{
+    -fx-text-fill: #d1d1d1;
+}
+
+.combo-box-popup .list-view .list-cell{
+    -fx-background-color: derived(#2a2a2a, 20%);
+}
+
+.combo-box-popup .list-view .list-cell:selected{
+    -fx-text-fill: derived(#2a2a2a, 20%);
+    -fx-background-color: #d1d1d1;
+}
+
+.combo-box-popup .list-view .list-cell:hover{
+    -fx-background-color: derived(#d1d1d1, -20%);
+    -fx-text-fill: derived(#2a2a2a, 20%);
+}
