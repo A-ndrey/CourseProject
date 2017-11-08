@@ -6,6 +6,11 @@ import edu.uci.ics.jung.graph.SparseGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 import javafx.collections.ObservableList;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,11 +68,11 @@ public class CGraph {
         return graph;
     }
 
-    public static void setCurrentALgorithm(String currentAlgorithm) {
+    public static void setCurrentAlgorithm(String currentAlgorithm) {
         CGraph.currentAlgorithm = currentAlgorithm;
     }
 
-    public static void startAlgorithm() {
+    public static void startAlgorithm() throws IOException {
         if (currentAlgorithm.equals(LEVIT)) {
             Vertex s = null, d = null;
             for (Vertex v : vertices) {
@@ -77,7 +82,8 @@ public class CGraph {
             }
             startLevitAlgorithm(graph, s, d);
         } else if (currentAlgorithm.equals(KRUSKAL)) {
-            startKruskalAlgorithm();
+            List<String> states = startKruskalAlgorithm();
+            writeToFile(states);
         }
     }
 
@@ -143,9 +149,12 @@ public class CGraph {
         return true;
     }
 
-    private static void startKruskalAlgorithm() {
+    private static List<String> startKruskalAlgorithm() {
         List<Edge> sortedEdges = graph.getEdges().stream().sorted(Edge::compare).collect(Collectors.toList());
+        List<String> states = new ArrayList<>();
         Graph<Vertex, Edge> temp = new SparseGraph<>();
+        LinkedList<Integer> sum = new LinkedList<>();
+        sum.add(0);
         sortedEdges.forEach(edge -> {
             Pair<Vertex> pair = graph.getEndpoints(edge);
 
@@ -155,11 +164,20 @@ public class CGraph {
                 temp.addVertex(pair.getFirst());
                 temp.addVertex(pair.getSecond());
                 temp.addEdge(edge, pair.getFirst(), pair.getSecond());
+                sum.add(edge.getWeight()+ sum.getLast());
             }
         });
+        sum.removeFirst();
+        sum.forEach(sums -> states.add("шаг " + (states.size()+1) + ": суммарный вес " + sums));
         sortedEdges.forEach(edge -> {
-            if(edge.getState() == Edge.PATH)edge.setState(Edge.NORMAL);
+            if(Objects.equals(edge.getState(), Edge.PATH))edge.setState(Edge.NORMAL);
         });
+        return states;
+    }
+
+    private static void writeToFile(List<String> list) throws IOException {
+        Path file = Paths.get("outputInformation.txt");
+        Files.write(file, list, Charset.forName("UTF-8"));
     }
 
     private CGraph() {

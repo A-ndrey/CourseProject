@@ -31,6 +31,7 @@ import org.apache.commons.collections15.Transformer;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
+import java.io.IOException;
 
 public class Controller {
 
@@ -74,7 +75,7 @@ public class Controller {
         toggleGroupAlgorythms.selectedToggleProperty().addListener((ov, old_val, new_val) -> {
             hBoxSelectVertices.setVisible(radioButtonLevit.isSelected());
             hBoxSelectVertices.setMinHeight(radioButtonLevit.isSelected() ? HBox.USE_COMPUTED_SIZE : 0);
-            CGraph.setCurrentALgorithm(radioButtonLevit.isSelected() ? CGraph.LEVIT : CGraph.KRUSKAL);
+            CGraph.setCurrentAlgorithm(radioButtonLevit.isSelected() ? CGraph.LEVIT : CGraph.KRUSKAL);
 
             buttonStartAlgorithm.setDisable(false);
 
@@ -110,7 +111,9 @@ public class Controller {
 
     public void buildGraph(ActionEvent actionEvent) {
         if (labelNumberOfVertex.getText().equals("0")) {
-            createAlert().showAndWait();
+            createAlert("Ошибка при построении графа",
+                    "Количество вершин должно быть больше 0",
+                    Alert.AlertType.INFORMATION).showAndWait();
             return;
         }
 
@@ -144,11 +147,11 @@ public class Controller {
         vBoxAlgorithms.setDisable(false);
     }
 
-    private Alert createAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Ошибка при построении графа");
+    private Alert createAlert(String title, String contentText, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText("Количество вершин должно быть больше 0");
+        alert.setContentText(contentText);
         return alert;
     }
 
@@ -185,7 +188,13 @@ public class Controller {
 
     public void startAlgorithm(ActionEvent actionEvent) {
         if (buttonStartAlgorithm.getText().equals("Запуск")) {
-            CGraph.startAlgorithm();
+            try {
+                CGraph.startAlgorithm();
+            } catch (IOException e) {
+                createAlert("Ошибка записи в файл",
+                        "Не удалось записать ифнормацию о ходе работы алгоритма в файл.",
+                        Alert.AlertType.ERROR).show();
+            }
             buttonStartAlgorithm.setText("Сброс");
             vBoxAlgorithms.setDisable(true);
         } else {
