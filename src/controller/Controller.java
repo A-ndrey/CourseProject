@@ -30,6 +30,7 @@ import org.apache.commons.collections15.Transformer;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 
@@ -65,6 +66,9 @@ public class Controller {
     @FXML
     private Button buttonStartAlgorithm;
 
+    @FXML
+    private Label labelWeightShowing;
+
     private SwingNode graphPanel;
 
     private VisualizationViewer<Vertex, Edge> vv;
@@ -79,6 +83,17 @@ public class Controller {
 
             buttonStartAlgorithm.setDisable(false);
 
+            vv.updateUI();
+        });
+
+        labelWeightShowing.setOnMouseClicked(event -> {
+            if (labelWeightShowing.getText().equals("Показать веса")) {
+                vv.getRenderContext().setEdgeLabelTransformer(edge -> edge.getState() != Edge.HIDE?edge.toString():"");
+                labelWeightShowing.setText("Скрыть веса");
+            } else {
+                vv.getRenderContext().setEdgeLabelTransformer(edge -> "");
+                labelWeightShowing.setText("Показать веса");
+            }
             vv.updateUI();
         });
 
@@ -117,6 +132,7 @@ public class Controller {
             return;
         }
 
+        labelWeightShowing.setText("Показать веса");
         buttonStartAlgorithm.setText("Запуск");
 
         Bounds bounds = paneGraph.getBoundsInParent();
@@ -144,6 +160,7 @@ public class Controller {
         comboBoxVertex1.setValue(vertices.get(0));
         comboBoxVertex2.setValue(vertices.get(vertices.size() - 1));
 
+
         vBoxAlgorithms.setDisable(false);
     }
 
@@ -162,10 +179,6 @@ public class Controller {
         RenderContext<Vertex, Edge> context = vv.getRenderContext();
         context.setEdgeShapeTransformer(new EdgeShape.Line<>());
         context.setEdgeStrokeTransformer(edge -> new BasicStroke(2));
-//        context.setEdgeLabelTransformer(edge -> {
-//            if(edge.getState() != Edge.HIDE) return edge.toString();
-//            return "";
-//        });
         context.setEdgeDrawPaintTransformer(edge -> {
             switch (edge.getState()) {
                 case Edge.HIDE:
