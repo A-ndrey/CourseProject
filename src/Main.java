@@ -1,8 +1,8 @@
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-//        Font.loadFont(getClass().getResource("res/Segoe ui.ttf").toExternalForm(), 10);
+        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("view/icon.png")));
         BorderPane panel = FXMLLoader.load(getClass().getResource("view/main.fxml"));
 
         Scene scene = new Scene(panel, 800, 600);
